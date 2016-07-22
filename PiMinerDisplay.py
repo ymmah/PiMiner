@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from PiMinerInfo import PiMinerInfo
-from Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
+from Adafruit_CharLCD import Adafruit_CharLCDPlate
 
 class PiMinerDisplay:
 	
@@ -16,11 +16,11 @@ class PiMinerDisplay:
 	
 	def __init__(self):
 		self.lcd.clear()
-		self.col = (self.lcd.ON,   self.lcd.OFF, self.lcd.YELLOW, self.lcd.OFF,
-	                self.lcd.GREEN, self.lcd.OFF, self.lcd.TEAL,   self.lcd.OFF,
-        	        self.lcd.BLUE,  self.lcd.OFF, self.lcd.VIOLET, self.lcd.OFF,
-                	self.lcd.RED,    self.lcd.OFF)
-		self.lcd.backlight(self.col[self.prevCol])
+		self.col = ((1.0, 1.0, 0.0),
+	                (0.0, 1.0, 0.0), (0.0, 1.0, 1.0),
+        	        (0.0, 0.0, 1.0), (1.0, 0.0, 1.0),
+                	(1.0, 0.0, 0.0))
+          	self.lcd.set_color(self.col[self.prevCol][0], self.col[self.prevCol][1], self.col[self.prevCol][2])
 	
 	#Show initial info (call after network connected)
 	def initInfo(self):
@@ -64,7 +64,7 @@ class PiMinerDisplay:
 	def backlightStep(self):
 		if self.prevCol is (len(self.col) -1): self.prevCol = -1
           	newCol = self.prevCol + 1
-          	self.lcd.backlight(self.col[newCol])
+          	self.lcd.set_color(self.col[newCol][0], self.col[newCol][1], self.col[newCol][2])
           	self.prevCol = newCol
 	
 	#Offset text to the right

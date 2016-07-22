@@ -2,7 +2,8 @@
 
 import sys, subprocess, time, urllib2, socket
 sys.path.append("/home/pi/Adafruit-Raspberry-Pi-Python-Code/Adafruit_CharLCDPlate")
-from Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
+from Adafruit_CharLCD import Adafruit_CharLCDPlate
+import Adafruit_CharLCD as LCD
 from PiMinerDisplay import PiMinerDisplay
 
 HOLD_TIME	= 3.0 #Time (seconds) to hold select button for shut down
@@ -11,7 +12,7 @@ HALT_ON_EXIT= True
 display		= PiMinerDisplay()
 lcd			= display.lcd
 prevCol		= -1
-prev		= -1
+prev		= ""
 lastTime	= time.time()
 
 def shutdown():
@@ -38,17 +39,11 @@ def internetOn():
 t = time.time()
 while True:
 	lcd.clear()
-	lcd.message('checking network\nconnection ...')
-	if (time.time() - t) > 120:
-		# No connection reached after 2 minutes
-		lcd.clear()
-		lcd.message('network is\nunavailable')
-		time.sleep(30)
-		exit(0)
+	lcd.message('checking network\nconnection (' + str(int(time.time() - t)) + 's)...')
 	try:
 		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		s.connect(('8.8.8.8', 0))
-		lcd.backlight(lcd.ON)
+		lcd.set_color(1.0, 1.0, 1.0)
 		lcd.clear()
 		lcd.message('IP address:\n' + s.getsockname()[0])
 		time.sleep(5)
@@ -64,23 +59,32 @@ while True:
 		time.sleep(1) # Pause a moment, keep trying
 '''
 
+buttons = ( (LCD.SELECT, 'Select', (1,1,1)),
+            (LCD.LEFT,   'Left'  , (1,0,0)),
+            (LCD.UP,     'Up'    , (0,0,1)),
+            (LCD.DOWN,   'Down'  , (0,1,0)),
+            (LCD.RIGHT,  'Right' , (1,0,1)) )
+
 # Listen for button presses
 while True:
-	b = lcd.buttons()
-	if b is not prev:
-		if lcd.buttonPressed(lcd.SELECT):
+	b = ""
+	for button in buttons:
+		if lcd.is_pressed(button[0]):
+			b += button[1]
+	if b != prev:
+		if lcd.is_pressed(LCD.SELECT):
 			tt = time.time()                        # Start time of button press
-			while lcd.buttonPressed(lcd.SELECT):	# Wait for button release
+			while lcd.is_pressed(LCD.SELECT):	# Wait for button release
 				if (time.time() - tt) >= HOLD_TIME: # Extended hold?
 					shutdown()						# We're outta here
 			display.backlightStep()
-		elif lcd.buttonPressed(lcd.LEFT):
+		elif lcd.is_pressed(LCD.LEFT):
 	  		display.scrollRight()
-		elif lcd.buttonPressed(lcd.RIGHT):
+		elif lcd.is_pressed(LCD.RIGHT):
 			display.scrollLeft()
-		elif lcd.buttonPressed(lcd.UP):
+		elif lcd.is_pressed(LCD.UP):
 			display.modeUp()
-		elif lcd.buttonPressed(lcd.DOWN):
+		elif lcd.is_pressed(LCD.DOWN):
 			display.modeDown()
 		prev = b
 		lastTime = time.time()
