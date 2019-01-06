@@ -1,7 +1,7 @@
 PiMiner v1.1
 =======
 ![](https://github.com/ymmah/PiMiner/blob/master/AI/ArtBoard%20Image%20(230).jpg)
-
+=======
 
 Python scripts for interfacing cgminer with the Adafruit 16x2 LCD + Keypad Kit for Raspberry Pi.
 
